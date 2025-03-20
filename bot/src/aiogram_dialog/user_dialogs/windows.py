@@ -1,7 +1,8 @@
 from aiogram.enums import ContentType
 from aiogram_dialog import Window
 from aiogram_dialog.widgets.input import MessageInput
-from aiogram_dialog.widgets.text import Const
+from aiogram_dialog.widgets.kbd import Cancel
+from aiogram_dialog.widgets.text import Const, Multi
 
 from . import states, keyboards, getters, on_clicks
 
@@ -24,7 +25,25 @@ send_loyalty_card_number = Window(
 )
 
 done = Window(
-    Const("Ви успішно зареєструвались. Наші адміністратори з "),
+    Const("Ви успішно зареєструвались. Наші адміністратори з вами зв'яжуться."),
     state=states.CreateNewUser.done,
-    keyboard=keyboards.done,
+)
+
+
+answer_admin = Window(
+    Const("Введіть ваше повідомлення:"),
+    MessageInput(func=on_clicks.on_send_answer, content_types=ContentType.TEXT),
+    Cancel(Const("Відмінити")),
+    state=states.AnswerOnMessage.send_message,
+)
+
+
+confirm_send = Window(
+    Multi(
+        Const("Ви впевнені, що хочете надіслати це повідомлення?\n"),
+        Const("Повідомлення: {message}"),
+    ),
+    keyboards.on_confirm_send_message,
+    state=states.AnswerOnMessage.confirm_send,
+    getter=getters.get_data_before_send_message,
 )

@@ -7,15 +7,12 @@ from aiogram.client.default import DefaultBotProperties
 from aiogram.fsm.storage.base import DefaultKeyBuilder
 from aiogram.fsm.storage.redis import RedisEventIsolation, RedisStorage
 from aiogram_dialog import setup_dialogs
-from aiogram_i18n.cores import FluentRuntimeCore
 
 from bot.src.aiogram_dialog import dialog_routers
 from bot.src.db.base import create_all
 from bot.src.db.redis import redis
 from bot.src.handlers import routers_list
 from bot.src.middleware.db import DbSessionMiddleware
-from bot.src.middleware.i18n_dialog import RedisI18nMiddleware
-from bot.src.utils.i18n_utils.i18n_format import make_i18n_middleware
 from bot.src.utils.set_bot_commands import set_default_commands
 from configreader import config
 
@@ -43,15 +40,6 @@ event_isolation = RedisEventIsolation(redis, key_builder=key_builder)
 dp = Dispatcher(storage=storage, events_isolation=event_isolation)
 router = Router(name=__name__)
 
-# I18n Settings
-path_to_locales = os.path.join("bot", 'src', "locales", "{locale}", "LC_MESSAGES")
-core = FluentRuntimeCore(path=path_to_locales)
-i18n_middleware = RedisI18nMiddleware(
-    core=core,
-    redis=redis,
-)
-i18n_dialog_middleware = make_i18n_middleware(path_to_locales)
-
 
 async def main():
     await bot.delete_webhook(drop_pending_updates=True)
@@ -63,9 +51,15 @@ async def main():
     dp.include_router(router)
     await create_all()
     await dp.start_polling(
-        bot, allowed_updates=[
-            "message", "callback_query", "chat_member", "chat_member_updated",
-            'my_chat_member', 'chat_join_request']
+        bot,
+        allowed_updates=[
+            "message",
+            "callback_query",
+            "chat_member",
+            "chat_member_updated",
+            "my_chat_member",
+            "chat_join_request",
+        ],
     )
 
 

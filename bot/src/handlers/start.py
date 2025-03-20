@@ -1,5 +1,5 @@
 from aiogram import F, Router
-from aiogram.filters import CommandObject, CommandStart
+from aiogram.filters import Command, CommandObject, CommandStart
 from aiogram.types import Message
 from bot.src.filters.admin_filters import IsAdmin
 from bot.src.utils.misc import add_user
@@ -8,7 +8,11 @@ from bot.src.utils.unitofwork import IUnitOfWork, UnitOfWork
 router = Router()
 
 
-@router.message(CommandStart())
+@router.message(Command("admin", "a"), IsAdmin())
+async def admin_start_handler(message: Message, uow: UnitOfWork): ...
+
+
+@router.message(CommandStart(), F.text.startswith("/start source_sms"))
 async def start_from_sms_handler(
     message: Message, command: CommandObject, uow: UnitOfWork
 ):
@@ -23,10 +27,6 @@ async def start_from_sms_handler(
     if not command.args or command.args == "source_sms":
         return
     await message.answer("Ви зайшли по sms посиланню")
-
-
-@router.message(CommandStart(), IsAdmin())
-async def admin_start_handler(message: Message, uow: UnitOfWork): ...
 
 
 @router.message(CommandStart())

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import Literal
 
-from arq.connections import RedisSettings
+
 from pydantic import PostgresDsn, ConfigDict
 from pydantic_settings import BaseSettings
 
@@ -35,15 +35,8 @@ class Config(BaseSettings):
         env_file=".env",
         env_file_encoding="utf-8",
         env_nested_delimiter="__",
-    )
+    ) # type: ignore
 
 
-config = Config()
+config = Config() # type: ignore
 
-
-class RedisConfig:
-    pool_settings = RedisSettings(
-        host=config.db_config.redis_host,
-        port=config.db_config.redis_port,
-        database=config.db_config.redis_db,
-    )

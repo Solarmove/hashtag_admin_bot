@@ -29,25 +29,25 @@ class SQLAlchemyRepository(AbstractRepository):
         self.session = session
 
     async def add_one(self, data: dict) -> int:
-        stmt = insert(self.model).values(**data).returning(self.model.id)
+        stmt = insert(self.model).values(**data).returning(self.model.id) # type: ignore
         res = await self.session.execute(stmt)
         return res.scalar_one()
 
     async def edit_one(self, id: int, data: dict):
         stmt = (
-            update(self.model).values(**data).filter_by(id=id).returning(self.model.id)
+            update(self.model).values(**data).filter_by(id=id).returning(self.model.id) # type: ignore
         )
         res = await self.session.execute(stmt)
         return res.scalar_one_or_none()
 
     async def find_all(self, **filter_by):
-        stmt = select(self.model).filter_by(**filter_by)
+        stmt = select(self.model).filter_by(**filter_by) # type: ignore
         res = await self.session.execute(stmt)
         res = res.scalars().all()
         return res
 
     async def find_one(self, **filter_by):
-        stmt = select(self.model).filter_by(**filter_by)
+        stmt = select(self.model).filter_by(**filter_by) # type: ignore
         res = await self.session.execute(stmt)
         res = res.scalars().first()
         return res

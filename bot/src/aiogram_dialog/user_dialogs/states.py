@@ -12,4 +12,5 @@ class CreateNewUser(StatesGroup):
 class AnswerOnMessage(StatesGroup):
     """Состояния для ответа на сообщение"""
 
-    send_answer = State()
+    send_message = State()
+    confirm_send = State()

@@ -6,11 +6,7 @@ from sqlalchemy.ext.asyncio.session import AsyncSession, async_sessionmaker
 from bot.src.db.base import async_session_maker
 from bot.src.db.repositories.repo import (
     AdminRepo,
-    UserRepo,
-    GroupRepo,
-    TaskRepo,
-    GroupPartisipantsRepo,
-    ReportRepo,
+    UserRepo
 )
 
 
@@ -35,7 +31,7 @@ class IUnitOfWork(ABC):
 
 
 class UnitOfWork(IUnitOfWork):
-    session_factory: async_sessionmaker[AsyncSession] = None
+    session_factory: async_sessionmaker[AsyncSession] = None # type: ignore
 
     def __call__(self, *args, **kwargs): ...
 
@@ -45,12 +41,12 @@ class UnitOfWork(IUnitOfWork):
         self.user_repo = UserRepo(self.session)
         self.admin_repo = AdminRepo(self.session)
 
-    async def __aenter__(self):
+    async def __aenter__(self): # type: ignore
         self.session = self.session_factory()
         self.transaction = await self.session.begin()
         return self
 
-    async def __aexit__(self, exc_type, *args):
+    async def __aexit__(self, exc_type, *args): # type: ignore
         if exc_type:
             await self.transaction.rollback()
         await self.session.close()
