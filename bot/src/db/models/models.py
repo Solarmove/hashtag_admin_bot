@@ -1,6 +1,6 @@
-from sqlalchemy import BIGINT, BOOLEAN, ForeignKey, func, VARCHAR
-from sqlalchemy.dialects.postgresql import ENUM, TIME, TIMESTAMP
-from sqlalchemy.orm import Mapped, mapped_column, Relationship
+from sqlalchemy import BOOLEAN, ForeignKey,  func, VARCHAR
+from sqlalchemy.dialects.sqlite import INTEGER
+from sqlalchemy.orm import mapped_column
 
 from bot.src.db.base import Base
 
@@ -8,7 +8,7 @@ from bot.src.db.base import Base
 class UserModel(Base):
     __tablename__ = "users"
 
-    id = mapped_column(BIGINT, primary_key=True, autoincrement=False)
+    id = mapped_column(INTEGER, primary_key=True, autoincrement=False)
     username = mapped_column(VARCHAR(255), nullable=False)
     full_name = mapped_column(VARCHAR(255), nullable=False)
     phone_number = mapped_column(VARCHAR(255), nullable=True)
@@ -18,5 +18,5 @@ class UserModel(Base):
 class AdminModel(Base):
     __tablename__ = "admins"
 
-    id = mapped_column(BIGINT, primary_key=True, autoincrement=False)
-    user_id = mapped_column(BIGINT, ForeignKey("users.id"), nullable=False)
+    id = mapped_column(INTEGER, primary_key=True, autoincrement=True)
+    user_id = mapped_column(INTEGER, ForeignKey("users.id"), nullable=False)

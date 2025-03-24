@@ -38,12 +38,13 @@ class UnitOfWork(IUnitOfWork):
     def __init__(self):
         if not self.session_factory:
             self.session_factory = async_session_maker
-        self.user_repo = UserRepo(self.session)
-        self.admin_repo = AdminRepo(self.session)
+
 
     async def __aenter__(self): # type: ignore
         self.session = self.session_factory()
         self.transaction = await self.session.begin()
+        self.user_repo = UserRepo(self.session)
+        self.admin_repo = AdminRepo(self.session)
         return self
 
     async def __aexit__(self, exc_type, *args): # type: ignore

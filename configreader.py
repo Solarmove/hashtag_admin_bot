@@ -17,7 +17,7 @@ class BotConfig(BaseSettings):
 class DBConfig(BaseSettings):
     """Database configuration"""
 
-    postgres_dsn: PostgresDsn
+    postgres_dsn: str
     redis_host: str
     redis_port: int
     redis_db: int

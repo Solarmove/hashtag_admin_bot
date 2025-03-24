@@ -13,7 +13,7 @@ async def get_user_url(username: str | None, user_id: int, full_name: str):
     if username:
         return f"@{username}"
     user_url = create_tg_link("user", id=user_id)
-    return f"<a href='{user_url}'>{full_name}</a>"
+    return user_url
 
 
 async def add_user(user_id: int, username: str | None, full_name: str, uow: UnitOfWork):
@@ -50,7 +50,14 @@ async def send_message(
 async def send_message_to_user(bot: Bot, user_id: int, text: str):
     """Отправляет сообщение пользователю"""
     text = f"📬 Повідомлення від адміністратора:\n\n<i>{text}</i>"
-    await send_message(bot, user_id, text)
+    answer_kb = InlineKeyboardBuilder()
+    answer_kb.add(
+        InlineKeyboardButton(
+            text="Відповісти",
+            callback_data="answer:admins",
+        )
+    )
+    await send_message(bot, user_id, text, keyboard=answer_kb.as_markup())
 
 
 async def send_message_to_admin(
@@ -65,5 +72,12 @@ async def send_message_to_admin(
             url=user_link,
         )
     )
+    kb.add(
+        InlineKeyboardButton(
+            text="Відповісти",
+            callback_data=f"answer:{user_id}",
+        )
+    )
+    kb.adjust(1, 1)
     text = f"📬 Повідомлення від користувача <b>{full_name}</b>:\n\n<i>{text}</i>"
     await send_message(bot, admin_id, text, keyboard=kb.as_markup())

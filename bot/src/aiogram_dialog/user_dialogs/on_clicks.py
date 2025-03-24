@@ -52,12 +52,15 @@ async def on_confirm_send_message(
     call: CallbackQuery, widget: Button, manager: DialogManager
 ):
     message: str = manager.dialog_data["message"]
-    admin_id: int = manager.start_data["admin_id"]  # type: ignore
     bot: Bot = manager.middleware_data["bot"]
     uow: UnitOfWork = manager.middleware_data["uow"]
-    user_model: UserModel | None = await uow.user_repo.find_one(id=admin_id)
+    admins = await uow.admin_repo.find_all()
+    user_model: UserModel | None = await uow.user_repo.find_one(id=call.from_user.id)
     if not user_model:
         return
-    await send_message_to_admin(bot, admin_id, admin_id, user_model.full_name, message)
+    for admin in admins:
+        await send_message_to_admin(
+            bot, admin.user_id, call.from_user.id, user_model.full_name, message
+        )
     await call.answer("Повідомлення надіслано", show_alert=True)
     await manager.done()

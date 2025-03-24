@@ -2,7 +2,7 @@ from aiogram.enums import ContentType
 from aiogram_dialog import Window
 from aiogram_dialog.widgets.input import MessageInput
 from aiogram_dialog.widgets.kbd import Cancel
-from aiogram_dialog.widgets.text import Const, Multi
+from aiogram_dialog.widgets.text import Const, Format, Multi
 
 from . import states, keyboards, getters, on_clicks
 
@@ -41,7 +41,7 @@ answer_admin = Window(
 confirm_send = Window(
     Multi(
         Const("Ви впевнені, що хочете надіслати це повідомлення?\n"),
-        Const("Повідомлення: {message}"),
+        Format  ("Повідомлення: {message}"),
     ),
     keyboards.on_confirm_send_message,
     state=states.AnswerOnMessage.confirm_send,
