@@ -1,6 +1,6 @@
 from typing import Sequence
 from aiogram import Bot
-from aiogram.types import User, user
+from aiogram.types import User
 from aiogram_dialog import DialogManager
 
 from bot.src.db.models.models import AdminModel, UserModel
@@ -58,4 +58,20 @@ async def get_admins_list(
             (admin_model.id, (await bot.get_chat(admin_model.user_id)).full_name)
             for admin_model in admins_model_list
         ]
+    }
+
+
+async def get_user_info(
+    dialog_manager: DialogManager,
+    uow: UnitOfWork,
+    **kwargs,
+):
+    user_id = dialog_manager.start_data.get("user_id") # type: ignore
+    user_model: UserModel | None = await uow.user_repo.find_one(id=user_id)
+    if not user_model:
+        return {}
+    return {
+        "user_full_name": user_model.full_name,
+        "loyalty_card_number_hashtag": user_model.loyalty_card_number_hash_tag,
+        "loyalty_card_number_hashrest": user_model.loyalty_card_number_hash_rest,
     }

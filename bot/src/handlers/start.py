@@ -1,3 +1,5 @@
+from typing import Literal
+
 from aiogram import F, Router
 from aiogram.filters import Command, CommandObject, CommandStart
 from aiogram.types import CallbackQuery, Message
@@ -7,7 +9,7 @@ from bot.src.aiogram_dialog.admin_dialogs.states import AdminMenu, MessageUser
 from bot.src.aiogram_dialog.user_dialogs.states import AnswerOnMessage, CreateNewUser
 from bot.src.filters.admin_filters import IsAdmin
 from bot.src.utils.misc import add_user
-from bot.src.utils.unitofwork import IUnitOfWork, UnitOfWork
+from bot.src.utils.unitofwork import UnitOfWork
 
 router = Router()
 
@@ -46,17 +48,35 @@ async def start_from_sms_handler(
 ):
     args = command.args
     payload = decode_payload(args) # type: ignore
-    if payload != "source_sms":
+    if not payload.startswith('sms_'):
         return
     if not message.from_user:
         return
-    # await add_user(
-    #     message.from_user.id,
-    #     message.from_user.username,
-    #     message.from_user.full_name,
-    #     uow,
-    # )
-    await dialog_manager.start(CreateNewUser.send_phone_number)
+    code = payload.split("_")[1]
+    if not code.isdigit():
+        return
+    bar: Literal['hashtag', 'hashrest'] = payload.split("_")[2] # noqa
+    code = int(code)
+    stored_link = await uow.deep_link_repo.find_one(code=code, bar=bar)
+    if not stored_link or stored_link.used is True:
+        return
+
+    await add_user(
+        message.from_user.id,
+        message.from_user.username,
+        message.from_user.full_name,
+        uow,
+    )
+    await dialog_manager.start(
+        CreateNewUser.send_phone_number,
+        data={
+            "deep_link_id": stored_link.id,
+            'bar': bar,
+            'code': code,
+            'deep_link_phone_number': stored_link.phone_number
+        },
+
+    )
 
 
 @router.message(CommandStart())

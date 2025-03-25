@@ -1,5 +1,5 @@
 from sqlalchemy import delete
-from bot.src.db.models.models import AdminModel, UserModel
+from bot.src.db.models.models import AdminModel, UserModel, DeepLink
 from bot.src.utils.repository import SQLAlchemyRepository
 
 
@@ -14,3 +14,6 @@ class AdminRepo(SQLAlchemyRepository):
         stmt = delete(self.model).filter_by(**filter_by)
         await self.session.execute(stmt)
         
+
+class DeepLinkRepo(SQLAlchemyRepository):
+     model = DeepLink

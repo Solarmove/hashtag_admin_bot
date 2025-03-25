@@ -4,7 +4,6 @@ from aiogram_dialog import DialogManager
 from aiogram_dialog.widgets.input import MessageInput
 from aiogram_dialog.widgets.kbd import Button
 
-import bot
 from bot.src.db.models.models import UserModel
 from bot.src.utils.misc import send_message, send_message_to_admin
 from bot.src.utils.unitofwork import UnitOfWork
@@ -16,6 +15,10 @@ async def on_send_phone_number(
     manager: DialogManager,
 ):
     if not message.contact:
+        await message.answer("Відправте номер телефону")
+        return
+    if message.contact.phone_number != manager.start_data["phone_number"]:
+        await message.answer('Номер телефону не співпадає з вказаним')
         return
     manager.dialog_data.update(
         phone_number=message.contact.phone_number,
@@ -38,6 +41,28 @@ async def on_send_loyalty_card_number(
     admins = await uow.admin_repo.find_all()
     phone_number = manager.dialog_data["phone_number"]
     loyalty_card_number = manager.dialog_data["loyalty_card_number"]
+    bar = manager.start_data["bar"]
+
+    await uow.user_repo.edit_one(
+        id=message.from_user.id,
+        data={
+            "loyalty_card_number_hash_tag": loyalty_card_number
+            if bar == "hashtag"
+            else None,
+            "loyalty_card_number_hash_rest": loyalty_card_number
+            if bar == "hashrest"
+            else None,
+            "phone_number": phone_number,
+        },
+    )
+    await uow.deep_link_repo.edit_one(
+        id=manager.start_data['deep_link_id'],
+        data={
+            'used': True,
+        }
+    )
+    await uow.commit()
+
     for admin in admins:
         await send_message(
             bot,

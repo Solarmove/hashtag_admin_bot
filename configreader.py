@@ -1,9 +1,6 @@
 from __future__ import annotations
 
-from typing import Literal
-
-
-from pydantic import PostgresDsn, ConfigDict
+from pydantic import ConfigDict
 from pydantic_settings import BaseSettings
 
 
@@ -30,6 +27,10 @@ class Config(BaseSettings):
     db_config: DBConfig
     admins: list[int]
     i18n_format_key: str
+    twilio_account_sid: str
+    twilio_auth_token: str
+    twilio_phone_number: str
+
 
     model_config = ConfigDict(
         env_file=".env",

@@ -4,15 +4,13 @@ from typing import Type
 from sqlalchemy.ext.asyncio.session import AsyncSession, async_sessionmaker
 
 from bot.src.db.base import async_session_maker
-from bot.src.db.repositories.repo import (
-    AdminRepo,
-    UserRepo
-)
+from bot.src.db.repositories.repo import AdminRepo, UserRepo, DeepLinkRepo
 
 
 class IUnitOfWork(ABC):
     user_repo = Type[UserRepo]
     admin_repo = Type[AdminRepo]
+    deep_link_repo = Type[DeepLinkRepo]
 
     @abstractmethod
     def __init__(self): ...
@@ -45,7 +43,9 @@ class UnitOfWork(IUnitOfWork):
         self.transaction = await self.session.begin()
         self.user_repo = UserRepo(self.session)
         self.admin_repo = AdminRepo(self.session)
+        self.deep_link_repo = DeepLinkRepo(self.session)
         return self
+
 
     async def __aexit__(self, exc_type, *args): # type: ignore
         if exc_type:

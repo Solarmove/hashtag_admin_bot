@@ -29,6 +29,7 @@ async def add_user(user_id: int, username: str | None, full_name: str, uow: Unit
             }
         )
         await uow.commit()
+    return user_exist
 
 
 async def send_message(

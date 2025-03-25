@@ -23,7 +23,11 @@ select_user = Window(
 
 def common_write_message_widgets():
     return [
-        Const("Напишіть повідомлення:"),
+        Multi(
+            Const("Напишіть повідомлення:"),
+            Format("Номер карти лояльності хештег: {loyalty_card_number_hashtag}"),
+            Format("Номер карти лояльності хешрест: {loyalty_card_number_hashrest}"),
+        ),
         TextInput(
             id="message",
             on_success=on_clicks.on_write_message,
@@ -35,6 +39,7 @@ write_message_to_user = Window(
     *common_write_message_widgets(),
     Cancel(Const("Назад")),
     state=states.MessageUser.write_message,
+    getter=getters.get_user_info
 )
 
 

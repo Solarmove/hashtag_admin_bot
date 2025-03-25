@@ -12,9 +12,12 @@ from bot.src.aiogram_dialog import dialog_routers
 from bot.src.db.base import create_all
 from bot.src.db.redis import redis
 from bot.src.handlers import routers_list
+from bot.src.handlers.sms_handler import send_sms_handler
 from bot.src.middleware.db import DbSessionMiddleware
 from bot.src.utils.set_bot_commands import set_default_commands
+from bot.src.utils.unitofwork import UnitOfWork
 from configreader import config
+from aiohttp import web
 
 # Logging
 logging.basicConfig(
@@ -50,6 +53,23 @@ async def main():
     bg_manager = setup_dialogs(dp)
     dp.include_router(router)
     await create_all()
+
+    app = web.Application()
+    app["bot"] = bot
+    app["dp"] = dp
+    app["uow"] = UnitOfWork
+    app["bg_manager"] = bg_manager
+
+    app.add_routes(
+        [
+            web.post("/send-sms", send_sms_handler),
+        ]
+    )
+
+    runner = web.AppRunner(app)
+    await runner.setup()
+    site = web.TCPSite(runner, host="localhost", port=8001)
+    await site.start()
     await dp.start_polling(
         bot,
         allowed_updates=[
@@ -61,6 +81,7 @@ async def main():
             "chat_join_request",
         ],
     )
+    await asyncio.Event().wait()
 
 
 if __name__ == "__main__":
