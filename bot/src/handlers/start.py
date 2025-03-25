@@ -4,7 +4,7 @@ from aiogram.types import CallbackQuery, Message
 from aiogram.utils.payload import decode_payload
 from aiogram_dialog import DialogManager
 from bot.src.aiogram_dialog.admin_dialogs.states import AdminMenu, MessageUser
-from bot.src.aiogram_dialog.user_dialogs.states import AnswerOnMessage
+from bot.src.aiogram_dialog.user_dialogs.states import AnswerOnMessage, CreateNewUser
 from bot.src.filters.admin_filters import IsAdmin
 from bot.src.utils.misc import add_user
 from bot.src.utils.unitofwork import IUnitOfWork, UnitOfWork
@@ -42,7 +42,7 @@ async def admin_start_handler(
 
 @router.message(CommandStart(deep_link=True))
 async def start_from_sms_handler(
-    message: Message, command: CommandObject, uow: UnitOfWork
+    message: Message, command: CommandObject, uow: UnitOfWork, dialog_manager: DialogManager
 ):
     args = command.args
     payload = decode_payload(args) # type: ignore
@@ -50,15 +50,13 @@ async def start_from_sms_handler(
         return
     if not message.from_user:
         return
-    await add_user(
-        message.from_user.id,
-        message.from_user.username,
-        message.from_user.full_name,
-        uow,
-    )
-    if not command.args or command.args == "source_sms":
-        return
-    await message.answer("Ви зайшли по sms посиланню")
+    # await add_user(
+    #     message.from_user.id,
+    #     message.from_user.username,
+    #     message.from_user.full_name,
+    #     uow,
+    # )
+    await dialog_manager.start(CreateNewUser.send_phone_number)
 
 
 @router.message(CommandStart())

@@ -4,8 +4,9 @@ from aiogram_dialog import DialogManager
 from aiogram_dialog.widgets.input import MessageInput
 from aiogram_dialog.widgets.kbd import Button
 
+import bot
 from bot.src.db.models.models import UserModel
-from bot.src.utils.misc import send_message_to_admin
+from bot.src.utils.misc import send_message, send_message_to_admin
 from bot.src.utils.unitofwork import UnitOfWork
 
 
@@ -32,7 +33,19 @@ async def on_send_loyalty_card_number(
     manager.dialog_data.update(
         loyalty_card_number=message.text,
     )
-    # TODO: send new user to admins
+    uow: UnitOfWork = manager.middleware_data["uow"]
+    bot: Bot = manager.middleware_data["bot"]
+    admins = await uow.admin_repo.find_all()
+    phone_number = manager.dialog_data["phone_number"]
+    loyalty_card_number = manager.dialog_data["loyalty_card_number"]
+    for admin in admins:
+        await send_message(
+            bot,
+            admin.user_id,
+            f"Новий користувач ({message.from_user.username or message.from_user.full_name}) зареєстрований в системі.\n\n" # type: ignore
+            f"Номер телефону: {phone_number}\n"
+            f"Номер лояльності: {loyalty_card_number}",
+        )
 
     await manager.next()
 
