@@ -1,7 +1,7 @@
 from aiogram.enums import ContentType
 from aiogram_dialog import Window
 from aiogram_dialog.widgets.input import MessageInput
-from aiogram_dialog.widgets.kbd import Cancel, Next
+from aiogram_dialog.widgets.kbd import Cancel, Next, RequestContact
 from aiogram_dialog.widgets.text import Const, Format, Multi
 
 from . import states, keyboards, getters, on_clicks
@@ -11,6 +11,7 @@ send_phone_number = Window(
     MessageInput(
         func=on_clicks.on_send_phone_number, content_types=ContentType.CONTACT
     ),
+    RequestContact(Const("Відправити номер телефону")),
     Next(Const("Номер не змінився"), when='phone_number_exist'),
     state=states.CreateNewUser.send_phone_number,
     getter=getters.get_phone_number_exist,
