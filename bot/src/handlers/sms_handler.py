@@ -10,6 +10,8 @@ from bot.src.utils.unitofwork import UnitOfWork
 import random
 from string import ascii_letters, digits
 
+logger = logging.getLogger(__name__)
+
 async def generate_random_code():
     return "".join(random.choices(f"{ascii_letters}{digits}", k=5))
 
@@ -36,7 +38,7 @@ async def send_sms_handler(request: web.Request):
                 continue
             code = await generate_random_code()
             deep_link = await create_start_link(bot, f"sms_{code}_{bar}", encode=True)
-            logging.info(f"phone_number: {phone_number}, code: {code}, deep_link: {deep_link}")
+            logger.info(f"phone_number: {phone_number}, code: {code}, deep_link: {deep_link}")
             await uow.deep_link_repo.add_one(
                 {
                     "phone_number": phone_number,
@@ -55,7 +57,7 @@ async def send_sms_handler(request: web.Request):
                     phone_number, text, from_
                 )
             except Exception as ex:
-                logging.error(ex)
+                logger.error(ex)
                 await uow.rollback()
                 continue
             await uow.commit()

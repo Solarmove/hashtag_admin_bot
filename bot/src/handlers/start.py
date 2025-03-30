@@ -1,3 +1,4 @@
+import logging
 from typing import Literal
 
 from aiogram import F, Router
@@ -13,6 +14,7 @@ from bot.src.utils.unitofwork import UnitOfWork
 
 router = Router()
 
+logger = logging.getLogger(__name__)
 
 @router.callback_query(F.data.startswith("answer:"))
 async def answer_admins_handler(call: CallbackQuery, dialog_manager: DialogManager):
@@ -49,16 +51,21 @@ async def start_from_sms_handler(
     args = command.args
     payload = decode_payload(args) # type: ignore
     if not payload.startswith('sms_'):
+        logger.info('Invalid payload: %s', payload)
         return
     if not message.from_user:
+        logger.info('No from_user in message: %s', message)
         return
     code = payload.split("_")[1]
     if not code.isdigit():
+        logger.info('Invalid code in payload: %s', code)
+
         return
     bar: Literal['hashtag', 'hashrest'] = payload.split("_")[2] # noqa
     code = int(code)
     stored_link = await uow.deep_link_repo.find_one(code=code, bar=bar)
     if not stored_link or stored_link.used is True:
+        logger.info('Deep link not found or already used: %s', stored_link)
         return
 
     await add_user(

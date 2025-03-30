@@ -6,6 +6,7 @@ from configreader import config
 
 client = Client(config.twilio_account_sid, config.twilio_auth_token)
 
+logger = logging.getLogger(__name__)
 
 async def send_sms(phone_number: str, message: str, from_: str):
     message = client.messages.create(
@@ -14,6 +15,7 @@ async def send_sms(phone_number: str, message: str, from_: str):
         body=message,
         from_=from_,
     )
+    logging.error(message.error_message)
     logging.info(f"SMS sent to {phone_number}")
     return message
 
