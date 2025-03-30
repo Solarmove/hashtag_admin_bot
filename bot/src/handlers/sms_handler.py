@@ -19,7 +19,7 @@ async def send_sms_handler(request: web.Request):
     bot: Bot = request.app["bot"]
     body = await request.json()
     phone_numbers = body.get("phone_numbers", [])
-    fullname = body.get("fullname", "")
+    fullname = body.get("full_name", "")
     bar: Literal['hashtag', 'hashrest'] = body.get("bar", [])
     if not phone_numbers:
         return web.json_response(
@@ -35,7 +35,7 @@ async def send_sms_handler(request: web.Request):
             if deep_link_exist:
                 continue
             code = await generate_random_code()
-            deep_link = await create_start_link(bot, f"sms_{code}_{bar}")
+            deep_link = await create_start_link(bot, f"sms_{code}_{bar}", encode=True)
             await uow.deep_link_repo.add_one(
                 {
                     "phone_number": phone_number,
@@ -48,9 +48,10 @@ async def send_sms_handler(request: web.Request):
                 f"{fullname} дарує тобі БЕЗКОШТОВНИЙ КАЛЬЯН у {bar_title}. Отримати можна за посиланням"
                 f"{deep_link}"
             )
+            from_ = "HASH&REST" if bar == "hashrest" else "HASHTAG BAR"
             try:
                 await send_sms(
-                    phone_number, text
+                    phone_number, text, from_
                 )
             except Exception as ex:
                 logging.error(ex)
