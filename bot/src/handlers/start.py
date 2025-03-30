@@ -58,7 +58,6 @@ async def start_from_sms_handler(
         return
     code = payload.split("_")[1]
     bar: Literal['hashtag', 'hashrest'] = payload.split("_")[2] # noqa
-    code = int(code)
     stored_link = await uow.deep_link_repo.find_one(code=code, bar=bar)
     if not stored_link or stored_link.used is True:
         logger.info('Deep link not found or already used: %s', stored_link)
