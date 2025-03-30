@@ -23,7 +23,7 @@ async def get_phone_number_exist(
         id=event_from_user.id
     )
     return {
-        'phone_number_exist': bool(user.phone_number)
+        'phone_number_exist': bool(user.phone_number) if user else False
     }
 
 async def get_reg_link(
@@ -33,6 +33,8 @@ async def get_reg_link(
 ):
     bar = dialog_manager.start_data['bar']
     return {
-        'reg_link': 'google.com' if bar == 'hashtag' else 'yandex.com'
+        "reg_link": "https://www.jetcs.co/n/HashTag"
+        if bar == "hashtag"
+        else "https://www.jetcs.co/n/Hashbar"
     }
 

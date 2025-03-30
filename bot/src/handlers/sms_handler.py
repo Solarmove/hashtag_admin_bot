@@ -19,6 +19,7 @@ async def send_sms_handler(request: web.Request):
     bot: Bot = request.app["bot"]
     body = await request.json()
     phone_numbers = body.get("phone_numbers", [])
+    fullname = body.get("fullname", "")
     bar: Literal['hashtag', 'hashrest'] = body.get("bar", [])
     if not phone_numbers:
         return web.json_response(
@@ -26,7 +27,7 @@ async def send_sms_handler(request: web.Request):
             status=403,
         )
     async with uow() as uow:
-        for phone_number in phone_numbers:
+        for phone_number in phone_numbers[:4]:
             deep_link_exist = await uow.deep_link_repo.find_one(
                 phone_numbers=phone_number,
                 bar=bar,
@@ -44,9 +45,8 @@ async def send_sms_handler(request: web.Request):
             )
             bar_title = "Hashtag Lounge Bar" if bar == "hashtag" else "Hash&Rest Lounge Bar"
             text = (
-                f"Привіт!\n"
-                f"Твій друг подарував тобі безкоштовний покур в {bar_title}.\n"
-                f"Перейди за посиланням {deep_link}"
+                f"{fullname} дарує тобі БЕЗКОШТОВНИЙ КАЛЬЯН у {bar_title}. Отримати можна за посиланням"
+                f"{deep_link}"
             )
             try:
                 await send_sms(
