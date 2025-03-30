@@ -57,10 +57,6 @@ async def start_from_sms_handler(
         logger.info('No from_user in message: %s', message)
         return
     code = payload.split("_")[1]
-    if not code.isdigit():
-        logger.info('Invalid code in payload: %s', code)
-
-        return
     bar: Literal['hashtag', 'hashrest'] = payload.split("_")[2] # noqa
     code = int(code)
     stored_link = await uow.deep_link_repo.find_one(code=code, bar=bar)
