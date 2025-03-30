@@ -29,7 +29,7 @@ async def send_sms_handler(request: web.Request):
     async with uow() as uow:
         for phone_number in phone_numbers[:4]:
             deep_link_exist = await uow.deep_link_repo.find_one(
-                phone_numbers=phone_number,
+                phone_number=phone_number,
                 bar=bar,
             )
             if deep_link_exist:
