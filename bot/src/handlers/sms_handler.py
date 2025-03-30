@@ -45,7 +45,7 @@ async def send_sms_handler(request: web.Request):
             )
             bar_title = "Hashtag Lounge Bar" if bar == "hashtag" else "Hash&Rest Lounge Bar"
             text = (
-                f"{fullname} дарує тобі БЕЗКОШТОВНИЙ КАЛЬЯН у {bar_title}. Отримати можна за посиланням"
+                f"{fullname} дарує тобі БЕЗКОШТОВНИЙ КАЛЬЯН у {bar_title}. Отримати можна за посиланням "
                 f"{deep_link}"
             )
             from_ = "HASH&REST" if bar == "hashrest" else "HASHTAG BAR"
