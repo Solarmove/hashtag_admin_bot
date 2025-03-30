@@ -36,6 +36,7 @@ async def send_sms_handler(request: web.Request):
                 continue
             code = await generate_random_code()
             deep_link = await create_start_link(bot, f"sms_{code}_{bar}", encode=True)
+            logging.info(f"phone_number: {phone_number}, code: {code}, deep_link: {deep_link}")
             await uow.deep_link_repo.add_one(
                 {
                     "phone_number": phone_number,
