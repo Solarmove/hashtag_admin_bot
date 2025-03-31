@@ -17,7 +17,7 @@ async def on_send_phone_number(
     if not message.contact:
         await message.answer("Відправте номер телефону")
         return
-    if message.contact.phone_number != manager.start_data["deep_link_phone_number"]:
+    if f"+{message.contact.phone_number}" != manager.start_data["deep_link_phone_number"]:
         await message.answer('Номер телефону не співпадає з вказаним')
         return
     manager.dialog_data.update(
