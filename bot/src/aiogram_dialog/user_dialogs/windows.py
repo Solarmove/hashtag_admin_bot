@@ -37,7 +37,7 @@ send_loyalty_card_number = Window(
 )
 
 done = Window(
-    Const("Ви успішно зареєструвались. Наші адміністратори з вами зв'яжуться."),
+    Const("Ви успішно зареєструвались. Наші адміністратори з вами звʼяжуться протягом трьох днів"),
     state=states.CreateNewUser.done,
 )
 
