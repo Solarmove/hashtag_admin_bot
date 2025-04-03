@@ -69,7 +69,9 @@ async def on_send_loyalty_card_number(
             admin.user_id,
             f"Новий користувач ({message.from_user.username or message.from_user.full_name}) зареєстрований в системі.\n\n" # type: ignore
             f"Номер телефону: {phone_number}\n"
-            f"Номер лояльності: {loyalty_card_number}",
+            f"Номер лояльності: {loyalty_card_number}"
+            f"Bar: {bar}",
+
         )
 
     await manager.next()
